@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ClawdbotConfig } from 'openclaw/plugin-sdk';
+import { Type } from '@sinclair/typebox';
 import { feishuMessageActions } from '../src/messaging/outbound/actions';
 
 function configuredFeishuConfig(): ClawdbotConfig {
@@ -34,5 +35,25 @@ describe('Feishu message action discovery', () => {
         },
       },
     });
+  });
+
+  it('keeps send text fields optional in the composed TypeBox schema', () => {
+    const discovery = feishuMessageActions.describeMessageTool({
+      cfg: configuredFeishuConfig(),
+      currentChannelProvider: 'feishu',
+    });
+    const schema = discovery?.schema;
+    if (!schema || Array.isArray(schema)) {
+      throw new Error('expected a single Feishu message tool schema contribution');
+    }
+
+    const composedSchema = Type.Object({
+      action: Type.String(),
+      ...schema.properties,
+    });
+
+    expect(composedSchema.required).toContain('action');
+    expect(composedSchema.required ?? []).not.toContain('message');
+    expect(composedSchema.required ?? []).not.toContain('text');
   });
 });

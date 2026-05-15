@@ -21,6 +21,7 @@ import type {
 import type { ChannelMessageToolSchemaContribution, ChannelThreadingToolContext } from 'openclaw/plugin-sdk/channel-contract';
 import { extractToolSend } from 'openclaw/plugin-sdk/tool-send';
 import { readStringParam } from 'openclaw/plugin-sdk/param-readers';
+import { Type } from '@sinclair/typebox';
 import { jsonResult, readReactionParams } from '../../core/sdk-compat';
 
 import { LarkClient } from '../../core/lark-client';
@@ -37,11 +38,11 @@ const FEISHU_SEND_TEXT_DESCRIPTION =
 
 const FEISHU_MESSAGE_TOOL_SCHEMA = {
   properties: {
-    message: { type: 'string', description: FEISHU_SEND_TEXT_DESCRIPTION },
-    text: { type: 'string', description: FEISHU_SEND_TEXT_DESCRIPTION },
+    message: Type.Optional(Type.String({ description: FEISHU_SEND_TEXT_DESCRIPTION })),
+    text: Type.Optional(Type.String({ description: FEISHU_SEND_TEXT_DESCRIPTION })),
   },
   visibility: 'current-channel' as const,
-} as unknown as ChannelMessageToolSchemaContribution;
+} satisfies ChannelMessageToolSchemaContribution;
 
 // ---------------------------------------------------------------------------
 // Helpers
